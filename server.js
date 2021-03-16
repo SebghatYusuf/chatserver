@@ -28,13 +28,33 @@ io.on('validate', (inData, inCallback) => {
     const user = users[inData.username];
     if (user) {
         if (user.password === inData.password) {
-            inCallback({ "status": "ok" })
+            inCallback({ status: "ok" })
         } else {
-            inCallback({ 'status': "fail" })
+            inCallback({ status: "fail" })
         }
     } else {
         users[inData.username] = inData;
         io.emit('newUser', users);
-        inCallback({ 'status': 'created' });
+        inCallback({ status: 'created' });
     }
+})
+
+
+io.on('create', (inData, inCallback) => {
+    if (rooms[inData.roomName]) {
+        inCallback({ status: 'exists' })
+    } else {
+        inData.users = {};
+        rooms[inData.username] = inData;
+        io.emit('created', rooms);
+        inCallback({ status: 'created', rooms: rooms });
+    }
+})
+
+io.on('listRooms', (inData, inCallback) => {
+    inCallback(rooms);
+})
+
+io.on('listUsers', (inData, inCallback) => {
+    inCallback(users);
 })
