@@ -58,3 +58,31 @@ io.on('listRooms', (inData, inCallback) => {
 io.on('listUsers', (inData, inCallback) => {
     inCallback(users);
 })
+
+io.on('join', (inData, inCallback) => {
+    const room = rooms[inData.roomName];
+    if (Objects.keys(room.users).length >= room.maxPeople) {
+        inCallback({ status: 'fail' })
+    } else {
+        room.users[inData.username] = users[inData.username];
+        io.emit('joined', room);
+        inCallback({ status: 'joined', room: room });
+    }
+})
+
+io.on('post', (inData, inCallback)=>{
+    io.emit('posted', inData);
+    inCallback({status: "ok"});
+})
+
+io.on('invite', (inData, inCallback)=>{
+    io.emit('invited', inData);
+    inCallback({status: "ok"});
+})
+
+io.on('leave', (inData, inCallback)=>{
+    const room = rooms[inData.roomName];
+    delete room.users[inData.username];
+    io.emit('left', room);
+    inCallback({status: 'ok'});
+})
