@@ -70,19 +70,36 @@ io.on('join', (inData, inCallback) => {
     }
 })
 
-io.on('post', (inData, inCallback)=>{
+io.on('post', (inData, inCallback) => {
     io.emit('posted', inData);
-    inCallback({status: "ok"});
+    inCallback({ status: "ok" });
 })
 
-io.on('invite', (inData, inCallback)=>{
+io.on('invite', (inData, inCallback) => {
     io.emit('invited', inData);
-    inCallback({status: "ok"});
+    inCallback({ status: "ok" });
 })
 
-io.on('leave', (inData, inCallback)=>{
+io.on('leave', (inData, inCallback) => {
     const room = rooms[inData.roomName];
     delete room.users[inData.username];
     io.emit('left', room);
-    inCallback({status: 'ok'});
+    inCallback({ status: 'ok' });
 })
+
+io.on('close', (inData, inCallback) => {
+    delete rooms[inData.roomName];
+    io.emit('closed', { roomName: inData.roomName, rooms: rooms });
+    inCallback(rooms);
+})
+
+io.on('kick', (inData, inCallback) => {
+    const room = rooms[inData.roomName];
+    const users = room.users;
+    delete users[inData.username];
+    io.emit('kicked', room);
+    inCallback({ status: "ok" });
+})
+
+
+
